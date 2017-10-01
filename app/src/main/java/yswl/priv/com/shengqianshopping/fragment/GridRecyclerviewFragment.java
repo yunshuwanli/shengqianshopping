@@ -34,7 +34,7 @@ public class GridRecyclerviewFragment extends MFragment {
         manager.setOrientation(OrientationHelper.VERTICAL);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mAdaoter = new RefreshRecyclerAdapter(getActivity(), null);
+        mAdaoter = new RefreshRecyclerAdapter();
 
 //        mRecyclerView.
     }
