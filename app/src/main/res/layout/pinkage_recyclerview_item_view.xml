@@ -10,11 +10,13 @@
         android:layout_height="120dp">
 
         <ImageView
+            android:id="@+id/iv_product_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@color/colorPrimaryDark" />
 
         <TextView
+            android:id="@+id/tv_coup_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -29,6 +31,8 @@
     </RelativeLayout>
 
     <TextView
+
+        android:id="@+id/tv_product_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@mipmap/ic_allow_right"
@@ -51,7 +55,7 @@
             android:text="券后 ：" />
 
         <TextView
-            android:id="@+id/tv_price"
+            android:id="@+id/tv_product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/text"

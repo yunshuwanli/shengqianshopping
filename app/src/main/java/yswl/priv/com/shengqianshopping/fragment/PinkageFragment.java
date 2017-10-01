@@ -57,6 +57,7 @@ public class PinkageFragment extends MFragment implements HttpCallback<JSONObjec
 
     ViewPager mViewPager;
     private CommonFragmentPagerAdapter mMyFragmentPagerAdapter;
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
@@ -91,8 +92,8 @@ public class PinkageFragment extends MFragment implements HttpCallback<JSONObjec
 
     private void requestCategroy() {
         String url = UrlUtil.getUrl(this, R.string.url_category_type_list);
-        Map<String,Object> par = new HashMap<>();
-        par.put("type","2");//包邮品类
+        Map<String, Object> par = new HashMap<>();
+        par.put("type", "2");//包邮品类
         HttpClientProxy.getInstance().postAsyn(url, REQUEST_ID_CATEGROY_TYPE2, par, this);
     }
 
@@ -100,20 +101,15 @@ public class PinkageFragment extends MFragment implements HttpCallback<JSONObjec
 
     @Override
     public void onSucceed(int requestId, JSONObject result) {
-        L.e(TAG,"onSucceed -- result :"+result);
-        if(ResultUtil.isCodeOK(result)){
+        L.e(TAG, "onSucceed -- result :" + result);
+        if (ResultUtil.isCodeOK(result)) {
             mCategorys_type2 = CategoryBean.jsonToList(
                     ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
-            if(mCategorys_type2!=null){
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMyFragmentPagerAdapter = new CommonFragmentPagerAdapter(
-                                getChildFragmentManager(), DataGenerator.getFragments2(),mCategorys_type2);
-                        mViewPager.setAdapter(mMyFragmentPagerAdapter);
-                        mSlidingTabLayout.setViewPager(mViewPager);
-                    }
-                });
+            if (mCategorys_type2 != null) {
+                mMyFragmentPagerAdapter = new CommonFragmentPagerAdapter(
+                        getChildFragmentManager(), DataGenerator.getFragments2(mCategorys_type2), mCategorys_type2);
+                mViewPager.setAdapter(mMyFragmentPagerAdapter);
+                mSlidingTabLayout.setViewPager(mViewPager);
 
             }
         }

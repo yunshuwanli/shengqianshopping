@@ -17,4 +17,11 @@ public enum SortEnum {
         this.value=value;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public String getKey() {
+        return key;
+    }
 }

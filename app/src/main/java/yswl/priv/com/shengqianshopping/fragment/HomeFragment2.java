@@ -81,8 +81,8 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
 
     private void requestCategroy() {
         String url = UrlUtil.getUrl(this, R.string.url_category_type_list);
-        Map<String,Object> par = new HashMap<>();
-        par.put("type","1");
+        Map<String, Object> par = new HashMap<>();
+        par.put("type", "1");
         HttpClientProxy.getInstance().postAsyn(url, REQUEST_ID_CATEGROY, par, this);
     }
 
@@ -111,19 +111,19 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
 
 
     List<CategoryBean> listDate;
+
     @Override
-    public void onSucceed(int requestId, JSONObject result) {
+    public void onSucceed(int requestId, final JSONObject result) {
         if (ResultUtil.isCodeOK(result)) {
 
             switch (requestId) {
                 case REQUEST_ID_BANNER:
                     mImags = BannerBean.jsonToList(
                             ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
-//                    mConvenientBanner.
-//                    banner.loadPic(mImags);
+                    banner.loadPic(mImags);
                     break;
                 case REQUEST_ID_CATEGROY:
-                     listDate = CategoryBean.jsonToList(
+                    listDate = CategoryBean.jsonToList(
                             ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
                     break;
             }

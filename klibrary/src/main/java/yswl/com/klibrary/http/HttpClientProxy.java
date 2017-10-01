@@ -34,6 +34,7 @@ import yswl.com.klibrary.http.CallBack.DownloadCallBack;
 import yswl.com.klibrary.http.CallBack.HttpCallback;
 import yswl.com.klibrary.http.okhttp.IRequestMethod;
 import yswl.com.klibrary.http.okhttp.OkHttpClientManager;
+import yswl.com.klibrary.util.L;
 import yswl.com.klibrary.util.ToastUtil;
 
 /**
@@ -134,6 +135,7 @@ public class HttpClientProxy implements IRequestMethod {
                 }
             }
             String params = tempParams.toString();
+            L.e(TAG,"http request params :"+ params);
             RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, params);
             String requestUrl;
             if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -170,6 +172,7 @@ public class HttpClientProxy implements IRequestMethod {
                 for (String key : paramsMap.keySet()) {
                     Object obj = paramsMap.get(key);
                     String value = (obj instanceof String) ? (String) obj : String.valueOf(obj);
+                    L.e(TAG,"http request params key :"+ key +", value ："+value);
                     builder.add(key, URLEncoder.encode(value, "utf-8"));
                 }
             }
@@ -367,7 +370,7 @@ public class HttpClientProxy implements IRequestMethod {
     }
 
 
-    private void analysisResponse(int requestId, Response response, final HttpCallback<JSONObject> callback) {
+    private void analysisResponse(final int requestId, Response response, final HttpCallback<JSONObject> callback) {
         int code = response.code();
         String msg = response.message();
         JSONObject result = null;
@@ -392,8 +395,17 @@ public class HttpClientProxy implements IRequestMethod {
         } finally {
             response.close();
         }
+        final int newcode = code;
+        final JSONObject newResult = result;
+        final String newMsg = msg;
         Log.e(TAG, "onSucceed data:" + result);
-        callback(requestId, response.code(), result, msg, callback);
+        MApplication.getApplication().getGolbalHander().post(new Runnable() {
+            @Override
+            public void run() {
+                callback(requestId, newcode, newResult, newMsg, callback);
+            }
+        });
+
     }
 
 

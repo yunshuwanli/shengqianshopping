@@ -2,10 +2,12 @@ package yswl.priv.com.shengqianshopping.bean;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +19,7 @@ import yswl.com.klibrary.util.DateJsonDeserializer;
  * Emial kangpeng@yunhetong.net
  */
 
-public class CategoryBean {
+public class CategoryBean implements Serializable{
    public String pid;
    public String title;
 

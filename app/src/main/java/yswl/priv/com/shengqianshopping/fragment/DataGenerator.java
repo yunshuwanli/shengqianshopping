@@ -12,6 +12,7 @@ import java.util.List;
 
 import yswl.com.klibrary.base.MFragment;
 import yswl.priv.com.shengqianshopping.R;
+import yswl.priv.com.shengqianshopping.bean.CategoryBean;
 
 public class DataGenerator {
 
@@ -27,10 +28,12 @@ public class DataGenerator {
         fragments[3] = new UserInfoFragment2();
         return fragments;
     }
-    public static List<MFragment> getFragments2() {
+    public static List<MFragment> getFragments2(List<CategoryBean> categorys) {
         List<MFragment> fragments = new ArrayList<>();
-        fragments.add(new RebateFragment());
-        fragments.add(new RebateFragment());
+        for (CategoryBean categroybean:categorys) {
+            fragments.add(ItemFragment.newInstance(categroybean));
+        }
+
         return fragments;
     }
 
