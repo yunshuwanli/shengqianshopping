@@ -1,43 +1,53 @@
 package yswl.priv.com.shengqianshopping.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import yswl.com.klibrary.base.MFragment;
-import yswl.com.klibrary.http.CallBack.HttpCallback;
 import yswl.priv.com.shengqianshopping.R;
 import yswl.priv.com.shengqianshopping.banner.SortEnum;
 import yswl.priv.com.shengqianshopping.bean.CategoryBean;
+import yswl.priv.com.shengqianshopping.bean.SerializableMap;
 
 
-public class ItemFragment extends MFragment implements View.OnClickListener, HttpCallback<JSONObject> {
+public class ItemFragment extends MFragment implements View.OnClickListener {
 
     private static final int REQUEST_ID = 1003;
 
     private static final String ARG_PARAM1 = "param1";
 
-    private CategoryBean mParam1;
+    public CategoryBean getmCategory() {
+        return mCategory;
+    }
+
+    public void setmCategory(CategoryBean mCategory) {
+        this.mCategory = mCategory;
+    }
+
+    private CategoryBean mCategory;
 
 
     public ItemFragment() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @return A new instance of fragment BlankFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ItemFragment newInstance(CategoryBean param1) {
+    @SuppressLint("ValidFragment")
+    public ItemFragment(CategoryBean param1) {
+        this.mCategory = param1;
+    }
+
+    public static ItemFragment newInstance2(CategoryBean param1) {
         ItemFragment fragment = new ItemFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
@@ -45,11 +55,16 @@ public class ItemFragment extends MFragment implements View.OnClickListener, Htt
         return fragment;
     }
 
+    public static ItemFragment newInstance(CategoryBean param1) {
+        ItemFragment fragment = new ItemFragment(param1);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = (CategoryBean) getArguments().getSerializable(ARG_PARAM1);
+            mCategory = (CategoryBean) getArguments().getSerializable(ARG_PARAM1);
         }
     }
 
@@ -58,8 +73,6 @@ public class ItemFragment extends MFragment implements View.OnClickListener, Htt
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_item, container, false);
     }
-
-    GridRecyclerviewFragment mFragment;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -75,42 +88,53 @@ public class ItemFragment extends MFragment implements View.OnClickListener, Htt
         sellCountProduct.setOnClickListener(this);
         priceProduct.setOnClickListener(this);
 
-        mFragment = GridRecyclerviewFragment.newInstance(mParam1);
-        getFragmentManager().beginTransaction()
-                .replace(R.id.content, mFragment)
+        mFragments = DataGenerator.getRecyclerViewFragments(mCategory);
+
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.content, mFragments[0])
                 .commitAllowingStateLoss();
     }
 
+    private MFragment[] mFragments;
+    private int index = 0;
 
     @Override
     public void onClick(View v) {
-        if (mFragment != null && mFragment.isAdded() && mFragment.isVisible()) {
-            int id = v.getId();
-            switch (id) {
-                case R.id.tv_hot:
-                    mFragment.requestPinkageData(SortEnum.HOT);
-                    break;
-                case R.id.tv_new:
-                    mFragment.requestPinkageData(SortEnum.NEW);
-                    break;
-                case R.id.tv_sell_count:
-                    mFragment.requestPinkageData(SortEnum.VOLUME);
-                    break;
-                case R.id.tv_price:
-                    mFragment.requestPinkageData(SortEnum.PRICE);
-                    break;
-            }
+        int postion = 0;
+        MFragment fragment = null;
+        int id = v.getId();
+        switch (id) {
+            case R.id.tv_hot:
+                fragment = mFragments[0];
+                postion = 0;
+                break;
+            case R.id.tv_new:
+                fragment = mFragments[1];
+                postion = 1;
+                break;
+            case R.id.tv_sell_count:
+                fragment = mFragments[2];
+                postion = 2;
+                break;
+            case R.id.tv_price:
+                fragment = mFragments[3];
+                postion = 3;
+                break;
         }
+        if (fragment == null) return;
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        mFragments[index].onPause(); // 暂停当前tab
+        if (fragment.isAdded()) {
+            fragment.onResume(); // 启动目标tab的onResume()
+        } else {
+            ft.add(R.id.content, fragment);
+        }
+        ft.hide(mFragments[index]);
+        ft.show(fragment); // 显示目标tab
+        ft.commitAllowingStateLoss();
+        index = postion;
+
     }
 
 
-    @Override
-    public void onSucceed(int requestId, JSONObject result) {
-
-    }
-
-    @Override
-    public void onFail(int requestId, String errorMsg) {
-
-    }
 }

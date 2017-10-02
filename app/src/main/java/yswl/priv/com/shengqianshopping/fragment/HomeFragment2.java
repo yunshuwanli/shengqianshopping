@@ -68,6 +68,7 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
         return inflater.inflate(R.layout.fragment_home2, container, false);
     }
 
+    CategoryBean mCategroy;
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConvenientBanner = (ConvenientBanner) view.findViewById(R.id.convenientBanner);
@@ -78,7 +79,6 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
 
     private static final int REQUEST_ID_CATEGROY = 100;
     private static final int REQUEST_ID_BANNER = 101;
-
     private void requestCategroy() {
         String url = UrlUtil.getUrl(this, R.string.url_category_type_list);
         Map<String, Object> par = new HashMap<>();
@@ -99,19 +99,8 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
         banner.loadPic(mImags);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-
-    List<CategoryBean> listDate;
-
+    List<CategoryBean> mCategorys;
     @Override
     public void onSucceed(int requestId, final JSONObject result) {
         if (ResultUtil.isCodeOK(result)) {
@@ -123,8 +112,12 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
                     banner.loadPic(mImags);
                     break;
                 case REQUEST_ID_CATEGROY:
-                    listDate = CategoryBean.jsonToList(
+                    mCategorys = CategoryBean.jsonToList(
                             ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
+
+                    //TODO 赋值
+                   mCategroy = mCategorys.get(0);
+                    getChildFragmentManager().beginTransaction().replace(R.id.content,ItemFragment.newInstance(mCategroy)).commit();
                     break;
             }
         }

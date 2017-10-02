@@ -2,6 +2,7 @@ package yswl.priv.com.shengqianshopping.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import yswl.com.klibrary.base.MFragment;
@@ -21,6 +23,9 @@ import yswl.com.klibrary.util.L;
 import yswl.priv.com.shengqianshopping.R;
 import yswl.priv.com.shengqianshopping.banner.SortEnum;
 import yswl.priv.com.shengqianshopping.bean.CategoryBean;
+import yswl.priv.com.shengqianshopping.bean.ProductDetail;
+import yswl.priv.com.shengqianshopping.bean.ResultUtil;
+import yswl.priv.com.shengqianshopping.bean.SerializableMap;
 import yswl.priv.com.shengqianshopping.fragment.adapter.DividerItemDecoration;
 import yswl.priv.com.shengqianshopping.fragment.adapter.GridRecyclerFragmentAdapter;
 import yswl.priv.com.shengqianshopping.util.UrlUtil;
@@ -30,18 +35,25 @@ import yswl.priv.com.shengqianshopping.util.UrlUtil;
  */
 public class GridRecyclerviewFragment extends MFragment implements HttpCallback<JSONObject> {
     RecyclerView mRecyclerView;
-    GridRecyclerFragmentAdapter mAdaoter;
+    GridRecyclerFragmentAdapter mAdapter;
 
 
     private static final int REQUEST_ID = 1003;
 
     private static final String ARG_PARAM1 = "param1";
 
-    private CategoryBean mParam1;
+    public SerializableMap getmParam1() {
+        return mParam1;
+    }
+
+    public void setmParam1(SerializableMap mParam1) {
+        this.mParam1 = mParam1;
+    }
+
+    private SerializableMap mParam1;//已经封装好的参数
 
 
     public GridRecyclerviewFragment() {
-        // Required empty public constructor
     }
 
     /**
@@ -51,12 +63,16 @@ public class GridRecyclerviewFragment extends MFragment implements HttpCallback<
      * @param param1 Parameter 1.
      * @return A new instance of fragment BlankFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static GridRecyclerviewFragment newInstance(CategoryBean param1) {
+    public static GridRecyclerviewFragment newInstance2(SerializableMap param1) {
         GridRecyclerviewFragment fragment = new GridRecyclerviewFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
         fragment.setArguments(args);
+        return fragment;
+    }
+    public static GridRecyclerviewFragment newInstance(SerializableMap param1) {
+        GridRecyclerviewFragment fragment = new GridRecyclerviewFragment();
+        fragment.setmParam1(param1);
         return fragment;
     }
 
@@ -64,7 +80,7 @@ public class GridRecyclerviewFragment extends MFragment implements HttpCallback<
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = (CategoryBean) getArguments().getSerializable(ARG_PARAM1);
+            mParam1 = (SerializableMap) getArguments().getSerializable(ARG_PARAM1);
         }
     }
 
@@ -81,11 +97,12 @@ public class GridRecyclerviewFragment extends MFragment implements HttpCallback<
 
         manager.setOrientation(OrientationHelper.VERTICAL);
         mRecyclerView.setLayoutManager(manager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        mAdaoter = new GridRecyclerFragmentAdapter();
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        mAdapter = new GridRecyclerFragmentAdapter();
 
-        requestPinkageData(null);
-
+        mRecyclerView.setAdapter(mAdapter);
+        requestPinkageData();
     }
 
     /**
@@ -95,22 +112,25 @@ public class GridRecyclerviewFragment extends MFragment implements HttpCallback<
      * 1. sort | 可 | 排序字段 | popularity/人气-默认 , volume/售量 ， new/最新 , price/价格
      * 1. sortBy | 可 | 排序方式 | 正序:asc 倒序:desc-默认
      */
-    public void requestPinkageData(SortEnum sort) {
+    public void requestPinkageData() {
         if (mParam1 == null) return;
+        Map<String,Object> parm = mParam1.map;
         String url = UrlUtil.getUrl(this, R.string.url_category_list);
-        Map<String, Object> par = new HashMap<>();
-        par.put("pid", mParam1.pid);
-        if (sort != null)
-            par.put("sort", sort.getValue());
-        HttpClientProxy.getInstance().postAsyn(url, REQUEST_ID, par, this);
+        HttpClientProxy.getInstance().postAsyn(url, REQUEST_ID, parm, this);
     }
 
 
     private static final String TAG = GridRecyclerviewFragment.class.getSimpleName();
-
+    List<ProductDetail> mProductList;
     @Override
     public void onSucceed(int requestId, JSONObject result) {
         L.e(TAG, "onSucceed result :" + result);
+        if (ResultUtil.isCodeOK(result)) {
+            mProductList = ProductDetail.jsonToList(
+                    ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST) );
+            mAdapter.setmProductList(mProductList);
+            mAdapter.notifyDataSetChanged();
+        }
 
     }
 

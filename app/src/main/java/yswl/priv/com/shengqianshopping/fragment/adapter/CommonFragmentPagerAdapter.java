@@ -6,23 +6,29 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import yswl.com.klibrary.base.MFragment;
 import yswl.priv.com.shengqianshopping.bean.CategoryBean;
+import yswl.priv.com.shengqianshopping.fragment.ItemFragment;
+import yswl.priv.com.shengqianshopping.fragment.RebateFragment;
 
-/**
- * Created by nixn@yunhetong.net on 2015/11/4.
- */
+
 public class CommonFragmentPagerAdapter extends FragmentPagerAdapter {
     //    private final String TAG="CommonFragmentPagerAdapter";
     private List<MFragment> fragmentList;
-    private List<CategoryBean> titles;
 
-    public CommonFragmentPagerAdapter(FragmentManager fm, List<MFragment> fragmentList, List<CategoryBean> titles) {
+    public CommonFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.fragmentList = fragmentList;
-        this.titles = titles;
+        this.fragmentList = new ArrayList<>();
+    }
+    public void setFragmentList(List<CategoryBean> categorys){
+        for (CategoryBean catb:categorys ) {
+            this.fragmentList.add(new ItemFragment(catb));
+        }
+        this.fragmentList.add(new RebateFragment());
+
     }
 
     @Override
@@ -39,10 +45,12 @@ public class CommonFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        CategoryBean categoryBean = titles.get(position);
-        if (categoryBean != null)
-            return categoryBean.title;
-        return " ";
+        if(position != fragmentList.size()-1) {
+            MFragment fragment = fragmentList.get(position);
+            if (((ItemFragment) fragment).getmCategory() != null)
+                return ((ItemFragment) fragment).getmCategory().title;
+        }
+        return " test";
     }
 
     @Override

@@ -86,6 +86,10 @@ public class PinkageFragment extends MFragment implements HttpCallback<JSONObjec
         mSlidingTabLayout.setTabTitleTextSize(15);
         mSlidingTabLayout.setTitleTextColor(getResources().getColor(R.color.colorPrimary),
                 getResources().getColor(R.color.colorAccent));
+        mMyFragmentPagerAdapter = new CommonFragmentPagerAdapter(getChildFragmentManager());
+        mViewPager.setAdapter(mMyFragmentPagerAdapter);
+
+
 //        mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.color5_4081ff));
 
     }
@@ -106,9 +110,9 @@ public class PinkageFragment extends MFragment implements HttpCallback<JSONObjec
             mCategorys_type2 = CategoryBean.jsonToList(
                     ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
             if (mCategorys_type2 != null) {
-                mMyFragmentPagerAdapter = new CommonFragmentPagerAdapter(
-                        getChildFragmentManager(), DataGenerator.getFragments2(mCategorys_type2), mCategorys_type2);
-                mViewPager.setAdapter(mMyFragmentPagerAdapter);
+                mMyFragmentPagerAdapter.setFragmentList(mCategorys_type2);
+                mMyFragmentPagerAdapter.notifyDataSetChanged();
+                mViewPager.setOffscreenPageLimit(mCategorys_type2.size());
                 mSlidingTabLayout.setViewPager(mViewPager);
 
             }

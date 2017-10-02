@@ -1,13 +1,20 @@
 package yswl.priv.com.shengqianshopping.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+
+import org.w3c.dom.Text;
 
 import yswl.com.klibrary.base.MFragment;
+import yswl.priv.com.shengqianshopping.LoginActivity;
 import yswl.priv.com.shengqianshopping.R;
 
 /**
@@ -25,5 +32,14 @@ public class UserInfoFragment2 extends MFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+       LinearLayout ll_head = (LinearLayout) view.findViewById(R.id.ll_head);
+       ImageView head = (ImageView) view.findViewById(R.id.iv_head);
+       TextView username = (TextView) view.findViewById(R.id.tv_user_name);
+        ll_head.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+            }
+        });
     }
 }
