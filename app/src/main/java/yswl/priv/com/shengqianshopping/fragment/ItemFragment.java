@@ -3,22 +3,15 @@ package yswl.priv.com.shengqianshopping.fragment;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import yswl.com.klibrary.base.MFragment;
 import yswl.priv.com.shengqianshopping.R;
-import yswl.priv.com.shengqianshopping.banner.SortEnum;
 import yswl.priv.com.shengqianshopping.bean.CategoryBean;
-import yswl.priv.com.shengqianshopping.bean.SerializableMap;
 
 
 public class ItemFragment extends MFragment implements View.OnClickListener {

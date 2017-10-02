@@ -3,9 +3,11 @@ package yswl.priv.com.shengqianshopping.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.bigkoo.convenientbanner.ConvenientBanner;
 
@@ -26,16 +28,10 @@ import yswl.priv.com.shengqianshopping.bean.CategoryBean;
 import yswl.priv.com.shengqianshopping.bean.ResultUtil;
 import yswl.priv.com.shengqianshopping.util.UrlUtil;
 
-public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject> {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>, View.OnClickListener {
+    private static final String FRAGMENT_TAG = "HomeFragment2_ItemFragment";
 
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     ConvenientBanner mConvenientBanner;
     private BannerUtil banner;
@@ -45,21 +41,11 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
         // Required empty public constructor
     }
 
-    public static HomeFragment2 newInstance(String param1, String param2) {
-        HomeFragment2 fragment = new HomeFragment2();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -68,10 +54,16 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
         return inflater.inflate(R.layout.fragment_home2, container, false);
     }
 
-    CategoryBean mCategroy;
+
+    //    LinearLayout mCrazyBuy, mAdvise, mSort, mPlan;
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConvenientBanner = (ConvenientBanner) view.findViewById(R.id.convenientBanner);
+        view.findViewById(R.id.ll_fkq).setOnClickListener(this);
+        view.findViewById(R.id.ll_tj).setOnClickListener(this);
+        view.findViewById(R.id.ll_sort).setOnClickListener(this);
+        view.findViewById(R.id.ll_plan).setOnClickListener(this);
+
         initBanner();
         requestCategroy();
         requestBanner();
@@ -79,6 +71,7 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
 
     private static final int REQUEST_ID_CATEGROY = 100;
     private static final int REQUEST_ID_BANNER = 101;
+
     private void requestCategroy() {
         String url = UrlUtil.getUrl(this, R.string.url_category_type_list);
         Map<String, Object> par = new HashMap<>();
@@ -99,8 +92,37 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
         banner.loadPic(mImags);
     }
 
+    @Override
+    public void onClick(View v) {
+//       Fragment frament = getChildFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+//        ItemFragment gridFragment = null;
+//        if(frament instanceof ItemFragment){
+//             gridFragment = (ItemFragment)frament ;
+//        }
+        switch (v.getId()) {
+            case R.id.ll_fkq:
+                CategoryBean category = getCrazyBuyProductCategoryId("抢购");
+                //TODO 新抢购页
+                break;
+            case R.id.ll_tj:
+                CategoryBean category2 = getCrazyBuyProductCategoryId("推荐");
+                //TODO 新推荐页
+                break;
+            case R.id.ll_sort:
+                CategoryBean category3 = getCrazyBuyProductCategoryId("排名");
+                //TODO 排名页
+                break;
+            case R.id.ll_plan:
+                CategoryBean category4 = getCrazyBuyProductCategoryId("预告");
+                //TODO 预告
+                break;
+
+        }
+    }
+
 
     List<CategoryBean> mCategorys;
+
     @Override
     public void onSucceed(int requestId, final JSONObject result) {
         if (ResultUtil.isCodeOK(result)) {
@@ -116,16 +138,34 @@ public class HomeFragment2 extends MFragment implements HttpCallback<JSONObject>
                             ResultUtil.analysisData(result).optJSONArray(ResultUtil.LIST));
 
                     //TODO 赋值
-                   mCategroy = mCategorys.get(0);
-                    getChildFragmentManager().beginTransaction().replace(R.id.content,ItemFragment.newInstance(mCategroy)).commit();
+                    if (mCategorys != null && mCategorys.size() > 0){
+
+                        addProductListModule(mCategorys.get(0));
+
+                    }
                     break;
             }
         }
 
     }
 
+    private void addProductListModule(CategoryBean category) {
+        getChildFragmentManager().beginTransaction().replace(R.id.content, ItemFragment.newInstance(category),FRAGMENT_TAG).commit();
+    }
+
     @Override
     public void onFail(int requestId, String errorMsg) {
 
+    }
+
+
+    public CategoryBean getCrazyBuyProductCategoryId(String key) {
+        if (mCategorys != null && mCategorys.size() > 0)
+            for (CategoryBean category: mCategorys) {
+                if(category.title.contains(key)){
+                    return category;
+                }
+            }
+        return null;
     }
 }
